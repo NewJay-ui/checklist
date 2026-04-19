@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ranking</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:15px;background:#0b0b0c;color:#fff;font-family:Arial}
+h1{text-align:center;margin:10px 0}
+input,button{
+background:#181818;color:#fff;border:0;border-radius:10px;
+padding:10px;font-size:14px
+}
+button{cursor:pointer}
+input{width:100%;margin:10px 0}
+
+.top{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+#t{display:grid;gap:10px}
+
+.r{
+display:flex;justify-content:space-between;align-items:center;
+background:#111;padding:10px;border-radius:12px
+}
+
+.l{display:grid;gap:6px}
+.n{font-weight:700}
+
+.go{
+width:44px;height:44px;padding:0;
+display:grid;place-items:center;
+font-size:16px
+}
+
+.c{
+background:#1a1a1a;
+padding:4px 10px;
+border-radius:999px;
+width:fit-content
+}
+
+img{
+width:90px;height:90px;
+object-fit:cover;
+border-radius:10px;
+cursor:pointer
+}
+
+/* gallery */
+#x{
+position:fixed;inset:0;
+background:#000d;
+display:none;
+place-items:center;
+z-index:99
+}
+#x img{
+max-width:95%;
+max-height:95%;
+width:auto;height:auto
+}
+
+/* dropdown */
+.menuWrap{position:relative}
+#menu{
+position:absolute;
+top:48px;left:0;
+width:280px;
+background:#121212;
+border-radius:14px;
+padding:12px;
+display:none;
+z-index:50
+}
+#menu input{margin:6px 0}
+#menu h3{margin:0 0 10px;font-size:15px}
+#menu button{width:100%;margin-top:8px}
+
+@media(max-width:600px){
+img{width:75px;height:75px}
+#menu{width:100%;left:0;right:0}
+}
+</style>
+</head>
+<body>
+
+<h1>🔥 Ranking</h1>
+
+<div class="top">
+
+<div class="menuWrap">
+<button onclick="menu.style.display=menu.style.display=='block'?'none':'block'">☰</button>
+
+<div id="menu">
+<h3>Eigenes Table hinzufügen</h3>
+
+<input id="n1" placeholder="Name">
+<input id="l1" placeholder="Mega Link">
+<input id="i1" placeholder="Bild 1 URL">
+<input id="i2" placeholder="Bild 2 URL">
+
+<button onclick="addPerson()">Hinzufügen</button>
+</div>
+</div>
+
+<button onclick="hide^=1;draw()">Bilder</button>
+<button onclick="alt^=1;draw()">Wechsel</button>
+
+</div>
+
+<input id="s" placeholder="Suchen...">
+
+<div id="t"></div>
+
+<div id="x" onclick="x.style.display='none'">
+<img id="xi">
+</div>
+
+<script>
+d=[
+["aaliyah yasin","https://mega.nz/folder/xUFARK7B#mCvpc18rJYr171vOA9TKvg","https://i.imgur.com/blV0wEK.jpeg"],
+["annywalker","https://mega.nz/folder/q9A1VQLQ#7MHvNUDfDEgkEB_CARrEJQ","https://i.imgur.com/KG9wrc2.jpeg"],
+["Comatozze","https://mega.nz/folder/hywlGJDY#dDp9Q3NFv_9cDkroIRlL4Q","https://i.imgur.com/XZyrg68.jpeg"],
+["ambergianna","https://mega.nz/folder/OFljlCQa#Euxx9eB5S5uhDDPOCjNEOw","https://i.imgur.com/7goIJ8U.jpeg"],
+["annaplusone","https://mega.nz/folder/m0Jw2DhA#Jv9qh5hRprdYVsuvXJBbkQ","https://i.imgur.com/w1Iz6nB.jpeg"],
+["cheekymz","https://mega.nz/folder/WFlmiLaS#baeU7J8RoJK175BXNu7K3Q","https://i.imgur.com/wuBA3bh.jpeg"],
+["BELLE DELPHINE","https://mega.nz/folder/kM0lHTDK#Uugrpy0bNcGZCMXZrL_gpw","https://i.imgur.com/6zqPLHV.jpeg"],
+["UrFavBellaBby","https://mega.nz/folder/QjEGkKgY#B1xbO-2J95onN_qosU7DWw","https://i.imgur.com/TYdDLj0.jpeg"],
+["alina_rose","https://mega.nz/folder/WQlFBbgS#5Mak9tPNyO6Ta7htdd4yfg","https://i.imgur.com/6aEoOaa.jpeg"],
+["KikiKattan","https://mega.nz/folder/iPJiVTJA#N0HS51e7Pe-NVbIORwVqiw","https://i.imgur.com/he0QDj4.jpeg"],
+["zoeneli","https://mega.nz/folder/r0R1gJRD#sdKE2e-5NcvnW8rWWFFNdA","https://i.imgur.com/9sBilJ8.jpeg"],
+["summerxiris","https://mega.nz/folder/SB8ChJKa#clqi4pSPtRYZudtoedVa1A","https://i.imgur.com/pYwo2pc.jpeg"],
+["Baylee Adami","https://mega.nz/folder/rEkxGZRQ#tk6Q09AsZAjrfVIuD5LTog","https://i.imgur.com/Y5DMKZO.jpeg"],
+["angelbaexo","https://mega.nz/folder/hM1TlApL#h0JpnWJNWnrmecYM16IIrw","https://i.imgur.com/fHFGb4l.jpeg"],
+["Kayla Kapoo","https://mega.nz/folder/Mbd21YCY#habGFO5MqPaOYGUgvoCG2Q","https://i.imgur.com/jRxgO2M.jpeg"],
+["creamyspot","https://mega.nz/folder/FQtBHIoA#bMNIVyAAPrtinorDC0JeJA","https://i.imgur.com/gI0CfNC.jpeg"]
+];
+
+a={
+"aaliyah yasin":"https://i.postimg.cc/x8DYCnC2/aaliyah-yasin.jpg",
+"Comatozze":"https://i.postimg.cc/x1Fw8nxp/Comatozze.jpg",
+"creamyspot":"https://i.postimg.cc/h4LRsFvv/creamyspot.jpg",
+"annaplusone":"https://i.postimg.cc/RV1CW6wv/annaplusone.jpg",
+"Baylee Adami":"https://i.postimg.cc/HnXY4jKH/Baylee-Adami.jpg",
+"angelbaexo":"https://i.postimg.cc/KYp8m6BK/angelbaexo.jpg",
+"annywalker":"https://i.postimg.cc/pLZd6hdQ/Anna-walker.jpg",
+"ambergianna":"https://i.postimg.cc/QN2V9ZPF/ambergianna.jpg",
+"Kayla Kapoo":"https://i.postimg.cc/R0gzcw0B/innocentbeautypre.jpg",
+"cheekymz":"https://i.postimg.cc/mgN4gvxd/mysteriousmagsx.jpg",
+"KikiKattan":"https://i.postimg.cc/x1kHr3WL/babyfacedhoe.jpg",
+"BELLE DELPHINE":"https://i.postimg.cc/90RVXzVZ/belledelphine.jpg",
+"UrFavBellaBby":"https://i.postimg.cc/1zr3bg5K/Ur-Fav-Bella-Bby.jpg",
+"alina_rose":"https://i.postimg.cc/3rSdKDjk/Alina-rose.jpg",
+"zoeneli":"https://i.postimg.cc/ht7JZPdz/Zoeneli.jpg",
+"summerxiris":"https://i.postimg.cc/4NWbRdy2/summerxiris.jpg"
+};
+
+extra=JSON.parse(localStorage.extra||"[]");
+extra.forEach(v=>{
+d.push([v.name,v.link,v.img1]);
+a[v.name]=v.img2;
+});
+
+k=JSON.parse(localStorage.k||"{}");
+hide=0;alt=0;
+
+function addPerson(){
+name=n1.value.trim();
+link=l1.value.trim();
+img1=i1.value.trim();
+img2=i2.value.trim();
+
+if(!name||!link||!img1||!img2)return alert("Alles ausfüllen");
+
+d.push([name,link,img1]);
+a[name]=img2;
+
+extra.push({name,link,img1,img2});
+localStorage.extra=JSON.stringify(extra);
+
+n1.value=l1.value=i1.value=i2.value="";
+menu.style.display="none";
+draw();
+}
+
+function go(name,url){
+k[name]=(k[name]||0)+1;
+localStorage.k=JSON.stringify(k);
+draw();
+window.open(url,"_blank");
+}
+
+function draw(){
+t.innerHTML="";
+
+[...d].sort((x,y)=>(k[y[0]]||0)-(k[x[0]]||0)).forEach(v=>{
+
+if(!v[0].toLowerCase().includes(s.value.toLowerCase()))return;
+
+name=v[0];
+url=v[1];
+img=alt&&a[name]?a[name]:v[2];
+
+t.innerHTML+=`
+<div class="r">
+<div class="l">
+<div class="n">${name}</div>
+<button class="go" onclick="go('${name}','${url}')">▶</button>
+<div class="c">${k[name]||0}</div>
+</div>
+
+${hide?"":`
+<img src="${img}" onclick="xi.src='${img}';x.style.display='grid'">
+`}
+
+</div>`;
+});
+}
+
+s.oninput=draw;
+draw();
+</script>
+
+</body>
+</html>
