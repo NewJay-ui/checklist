@@ -8,7 +8,8 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;padding:15px;background:#0b0b0c;color:#fff;font-family:Arial}
-h1{text-align:center;margin:10px 0}
+
+.top{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
 input,button{
 background:#181818;color:#fff;border:0;border-radius:10px;
 padding:10px;font-size:14px
@@ -16,12 +17,12 @@ padding:10px;font-size:14px
 button{cursor:pointer}
 input{width:100%;margin:10px 0}
 
-.top{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
 #t{display:grid;gap:10px}
 
 .r{
 display:flex;justify-content:space-between;align-items:center;
-background:#111;padding:10px;border-radius:12px
+background:#111;padding:10px;border-radius:12px;
+position:relative;
 }
 
 .l{display:grid;gap:6px}
@@ -30,7 +31,6 @@ background:#111;padding:10px;border-radius:12px
 .go{
 width:44px;height:44px;padding:0;
 display:grid;place-items:center;
-font-size:16px
 }
 
 .c{
@@ -41,45 +41,54 @@ width:fit-content
 }
 
 img{
-width:90px;height:90px;
+width:80px;height:80px;
 object-fit:cover;
 border-radius:10px;
 cursor:pointer
 }
 
-/* gallery */
-#x{
-position:fixed;inset:0;
-background:#000d;
-display:none;
-place-items:center;
-z-index:99
-}
-#x img{
-max-width:95%;
-max-height:95%;
-width:auto;height:auto
+/* ❤️ */
+.heart{
+position:absolute;
+bottom:8px;
+right:8px;
+font-size:18px;
 }
 
-/* dropdown */
-.menuWrap{position:relative}
+/* dropdown fix */
 #menu{
 position:absolute;
 top:48px;left:0;
 width:280px;
+max-height:80vh;
+overflow-y:auto;
 background:#121212;
 border-radius:14px;
 padding:12px;
 display:none;
 z-index:50
 }
-#menu input{margin:6px 0}
-#menu h3{margin:0 0 10px;font-size:15px}
-#menu button{width:100%;margin-top:8px}
 
 @media(max-width:600px){
-img{width:75px;height:75px}
-#menu{width:100%;left:0;right:0}
+#menu{
+width:100%;
+max-height:85vh;
+}
+}
+
+/* context menu */
+#ctx{
+position:fixed;
+background:#1a1a1a;
+padding:10px;
+border-radius:10px;
+display:none;
+z-index:999;
+}
+#ctx button{
+display:block;
+width:100%;
+margin:5px 0;
 }
 </style>
 </head>
@@ -89,19 +98,18 @@ img{width:75px;height:75px}
 
 <div class="top">
 
-<div class="menuWrap">
-<button onclick="menu.style.display=menu.style.display=='block'?'none':'block'">☰</button>
+<button onclick="menu.style.display^=1">☰</button>
 
 <div id="menu">
 <h3>Eigenes Table hinzufügen</h3>
-
 <input id="n1" placeholder="Name">
-<input id="l1" placeholder="Mega Link">
-<input id="i1" placeholder="Bild 1 URL">
-<input id="i2" placeholder="Bild 2 URL">
-
+<input id="l1" placeholder="Link">
+<input id="i1" placeholder="Bild 1">
+<input id="i2" placeholder="Bild 2">
 <button onclick="addPerson()">Hinzufügen</button>
-</div>
+
+<hr>
+<button onclick="favMode^=1;draw()">⭐ Favoriten Modus</button>
 </div>
 
 <button onclick="hide^=1;draw()">Bilder</button>
@@ -110,116 +118,163 @@ img{width:75px;height:75px}
 </div>
 
 <input id="s" placeholder="Suchen...">
-
 <div id="t"></div>
 
-<div id="x" onclick="x.style.display='none'">
-<img id="xi">
+<!-- context menu -->
+<div id="ctx">
+<button onclick="editItem()">Bearbeiten</button>
+<button onclick="deleteItem()">Löschen</button>
+<button onclick="toggleFav()">Favorisieren</button>
 </div>
 
 <script>
-d=[
-["aaliyah yasin","https://mega.nz/folder/xUFARK7B#mCvpc18rJYr171vOA9TKvg","https://i.imgur.com/blV0wEK.jpeg"],
-["annywalker","https://mega.nz/folder/q9A1VQLQ#7MHvNUDfDEgkEB_CARrEJQ","https://i.imgur.com/KG9wrc2.jpeg"],
-["Comatozze","https://mega.nz/folder/hywlGJDY#dDp9Q3NFv_9cDkroIRlL4Q","https://i.imgur.com/XZyrg68.jpeg"],
-["ambergianna","https://mega.nz/folder/OFljlCQa#Euxx9eB5S5uhDDPOCjNEOw","https://i.imgur.com/7goIJ8U.jpeg"],
-["annaplusone","https://mega.nz/folder/m0Jw2DhA#Jv9qh5hRprdYVsuvXJBbkQ","https://i.imgur.com/w1Iz6nB.jpeg"],
-["cheekymz","https://mega.nz/folder/WFlmiLaS#baeU7J8RoJK175BXNu7K3Q","https://i.imgur.com/wuBA3bh.jpeg"],
-["BELLE DELPHINE","https://mega.nz/folder/kM0lHTDK#Uugrpy0bNcGZCMXZrL_gpw","https://i.imgur.com/6zqPLHV.jpeg"],
-["UrFavBellaBby","https://mega.nz/folder/QjEGkKgY#B1xbO-2J95onN_qosU7DWw","https://i.imgur.com/TYdDLj0.jpeg"],
-["alina_rose","https://mega.nz/folder/WQlFBbgS#5Mak9tPNyO6Ta7htdd4yfg","https://i.imgur.com/6aEoOaa.jpeg"],
-["KikiKattan","https://mega.nz/folder/iPJiVTJA#N0HS51e7Pe-NVbIORwVqiw","https://i.imgur.com/he0QDj4.jpeg"],
-["zoeneli","https://mega.nz/folder/r0R1gJRD#sdKE2e-5NcvnW8rWWFFNdA","https://i.imgur.com/9sBilJ8.jpeg"],
-["summerxiris","https://mega.nz/folder/SB8ChJKa#clqi4pSPtRYZudtoedVa1A","https://i.imgur.com/pYwo2pc.jpeg"],
-["Baylee Adami","https://mega.nz/folder/rEkxGZRQ#tk6Q09AsZAjrfVIuD5LTog","https://i.imgur.com/Y5DMKZO.jpeg"],
-["angelbaexo","https://mega.nz/folder/hM1TlApL#h0JpnWJNWnrmecYM16IIrw","https://i.imgur.com/fHFGb4l.jpeg"],
-["Kayla Kapoo","https://mega.nz/folder/Mbd21YCY#habGFO5MqPaOYGUgvoCG2Q","https://i.imgur.com/jRxgO2M.jpeg"],
-["creamyspot","https://mega.nz/folder/FQtBHIoA#bMNIVyAAPrtinorDC0JeJA","https://i.imgur.com/gI0CfNC.jpeg"]
+
+// Daten
+d = [
+["aaliyah yasin","https://mega.nz/...","https://i.imgur.com/blV0wEK.jpeg"],
+["annywalker","https://mega.nz/...","https://i.imgur.com/KG9wrc2.jpeg"]
 ];
 
-a={
-"aaliyah yasin":"https://i.postimg.cc/x8DYCnC2/aaliyah-yasin.jpg",
-"Comatozze":"https://i.postimg.cc/x1Fw8nxp/Comatozze.jpg",
-"creamyspot":"https://i.postimg.cc/h4LRsFvv/creamyspot.jpg",
-"annaplusone":"https://i.postimg.cc/RV1CW6wv/annaplusone.jpg",
-"Baylee Adami":"https://i.postimg.cc/HnXY4jKH/Baylee-Adami.jpg",
-"angelbaexo":"https://i.postimg.cc/KYp8m6BK/angelbaexo.jpg",
-"annywalker":"https://i.postimg.cc/pLZd6hdQ/Anna-walker.jpg",
-"ambergianna":"https://i.postimg.cc/QN2V9ZPF/ambergianna.jpg",
-"Kayla Kapoo":"https://i.postimg.cc/R0gzcw0B/innocentbeautypre.jpg",
-"cheekymz":"https://i.postimg.cc/mgN4gvxd/mysteriousmagsx.jpg",
-"KikiKattan":"https://i.postimg.cc/x1kHr3WL/babyfacedhoe.jpg",
-"BELLE DELPHINE":"https://i.postimg.cc/90RVXzVZ/belledelphine.jpg",
-"UrFavBellaBby":"https://i.postimg.cc/1zr3bg5K/Ur-Fav-Bella-Bby.jpg",
-"alina_rose":"https://i.postimg.cc/3rSdKDjk/Alina-rose.jpg",
-"zoeneli":"https://i.postimg.cc/ht7JZPdz/Zoeneli.jpg",
-"summerxiris":"https://i.postimg.cc/4NWbRdy2/summerxiris.jpg"
-};
+// Speicher
+extra = JSON.parse(localStorage.extra||"[]");
+k = JSON.parse(localStorage.k||"{}");
+fav = JSON.parse(localStorage.fav||"{}");
 
-extra=JSON.parse(localStorage.extra||"[]");
-extra.forEach(v=>{
-d.push([v.name,v.link,v.img1]);
-a[v.name]=v.img2;
-});
+extra.forEach(v=>d.push([v.name,v.link,v.img1]));
 
-k=JSON.parse(localStorage.k||"{}");
-hide=0;alt=0;
+hide=0; alt=0; favMode=0;
 
+function save(){
+localStorage.extra=JSON.stringify(extra);
+localStorage.k=JSON.stringify(k);
+localStorage.fav=JSON.stringify(fav);
+}
+
+// Add
 function addPerson(){
-name=n1.value.trim();
-link=l1.value.trim();
-img1=i1.value.trim();
-img2=i2.value.trim();
+let name=n1.value.trim();
+let link=l1.value.trim();
+let img1=i1.value.trim();
+let img2=i2.value.trim();
 
-if(!name||!link||!img1||!img2)return alert("Alles ausfüllen");
+if(!name||!link||!img1)return;
 
 d.push([name,link,img1]);
-a[name]=img2;
-
 extra.push({name,link,img1,img2});
-localStorage.extra=JSON.stringify(extra);
-
-n1.value=l1.value=i1.value=i2.value="";
-menu.style.display="none";
+save();
 draw();
 }
 
+// Klick
 function go(name,url){
 k[name]=(k[name]||0)+1;
-localStorage.k=JSON.stringify(k);
+save();
 draw();
-window.open(url,"_blank");
+window.open(url);
 }
 
+// Draw
 function draw(){
 t.innerHTML="";
 
-[...d].sort((x,y)=>(k[y[0]]||0)-(k[x[0]]||0)).forEach(v=>{
+let list=[...d].filter(v=>
+v[0].toLowerCase().includes(s.value.toLowerCase())
+);
 
-if(!v[0].toLowerCase().includes(s.value.toLowerCase()))return;
+list.sort((a,b)=>{
+let fa=fav[a[0]]?1:0;
+let fb=fav[b[0]]?1:0;
 
-name=v[0];
-url=v[1];
-img=alt&&a[name]?a[name]:v[2];
+if(favMode){
+if(fa!==fb) return fb-fa;
+}else{
+if(fa!==fb) return fb-fa;
+}
+
+return (k[b[0]]||0)-(k[a[0]]||0);
+});
+
+list.forEach(v=>{
+if(favMode && !fav[v[0]]) return;
+
+let name=v[0];
+let url=v[1];
+let img=v[2];
 
 t.innerHTML+=`
-<div class="r">
+<div class="r" 
+oncontextmenu="openCtx(event,'${name}')"
+ontouchstart="hold(event,'${name}')">
+
 <div class="l">
 <div class="n">${name}</div>
 <button class="go" onclick="go('${name}','${url}')">▶</button>
 <div class="c">${k[name]||0}</div>
 </div>
 
-${hide?"":`
-<img src="${img}" onclick="xi.src='${img}';x.style.display='grid'">
-`}
+${hide?"":`<img src="${img}">`}
+
+${fav[name]?'<div class="heart">❤️</div>':""}
 
 </div>`;
 });
 }
 
+// Context Menü
+let current=null;
+
+function openCtx(e,name){
+e.preventDefault();
+current=name;
+ctx.style.display="block";
+ctx.style.left=e.pageX+"px";
+ctx.style.top=e.pageY+"px";
+}
+
+// Long press mobile
+let timer;
+function hold(e,name){
+timer=setTimeout(()=>{
+openCtx(e.touches[0],name);
+},500);
+}
+document.body.ontouchend=()=>clearTimeout(timer);
+
+// Aktionen
+function deleteItem(){
+d=d.filter(x=>x[0]!=current);
+extra=extra.filter(x=>x.name!=current);
+delete fav[current];
+delete k[current];
+save();
+ctx.style.display="none";
+draw();
+}
+
+function editItem(){
+let item=d.find(x=>x[0]==current);
+let newLink=prompt("Neuer Link",item[1]);
+if(newLink){
+item[1]=newLink;
+save();
+draw();
+}
+ctx.style.display="none";
+}
+
+function toggleFav(){
+fav[current]=!fav[current];
+save();
+ctx.style.display="none";
+draw();
+}
+
+// close ctx
+document.onclick=()=>ctx.style.display="none";
+
 s.oninput=draw;
 draw();
+
 </script>
 
 </body>
